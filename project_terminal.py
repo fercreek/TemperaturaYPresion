@@ -71,6 +71,9 @@ finally:
 
 
 if system == 1:
+	print ST
+	print D
+	print Vmed
 	Vmax = (ST / (ST-D)) * Vmed
 	print type(Den)
 	print type(Vmax)
