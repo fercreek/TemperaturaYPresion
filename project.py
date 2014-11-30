@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: latin-1 -*-
-
 from math import sqrt
 from math import pow
 from math import pi
 from math import log1p
 from math import log
 from math import e
+import csv
 
 print "Transferencia de calor"
 print "Producto Integrador"
@@ -20,16 +20,6 @@ while system not in (1,2):
 
 print "Dame los siguientes datos: "
 ###Variables a introducir
-L  = raw_input("Longitud de tubo(L): ___ [m]")
-TS = raw_input("Temperatura de condensacion(TS): ___ [°C] ")
-TI = raw_input("Temperatura de entrada: ___ [°C"])
-Vmed = raw_input("Velocidad media(V): ___ [m/s]")
-D = raw_input("Diametro exterior(D): ___ [m]")
-SL = raw_input("SL: ___ [m]")
-ST = raw_input("ST: ___ [m]")
-NFilas = raw_input("Numero de filas de tubos: (NT)")
-NTubos = raw_input("Numero de tubos en cada fila: (NL)")
-
 # L  = 3
 # TS = 100 
 # TI = 20 
@@ -39,22 +29,55 @@ NTubos = raw_input("Numero de tubos en cada fila: (NL)")
 # ST = 0.04
 # NFilas = 20
 # NTubos = 10
+
+L  = input("Longitud de tubo(L): ___ [m] ")
+TS = input("Temperatura de condensacion(TS): ___ [°C] ")
+TI = input("Temperatura de entrada: ___ [°C] ")
+Vmed = input("Velocidad media(V): ___ [m/s] ")
+D = input("Diametro exterior(D): ___ [m] ")
+SL = input("SL: ___ [m] ")
+ST = input("ST: ___ [m] ")
+NFilas = input("Numero de filas de tubos: (NT) ")
+NTubos = input("Numero de tubos en cada fila: (NL) ")
+Temp = (TS + TI)/2
+
+try:
+	with open('table.csv', 'rb') as f:
+		reader = csv.reader(f)
+		for row in reader:
+			if str(Temp) == row[0]:
+				print row
+				Den = float(row[1])
+				Cesp = float(row[2])
+				Cterm = float(row[3])
+				Dterm = float(row[4])
+				Vdin =  float(row[5])
+				Vcin = float(row[6])
+				Pr = float(row[7])
+			if str(TS) == row[0]:
+				Prs = float(row[7])
+finally: 
+	f.close()
+
 # Den = 1.059
 # Pr = 0.7202
 # Prs = 0.7111
 # Temp = 60
 # CP = 1007
-# k=0.02808
 # Cterm = 0.02808
 # Dterm= 2.632e-5
 # Vdin = 2.008e-5
 # Vcin = 1.896e-5
-	
-PT = ST / D
+
 
 if system == 1:
 	Vmax = (ST / (ST-D)) * Vmed
+	print type(Den)
+	print type(Vmax)
+	print type(D)
+	print type(Vcin)
 	ReD = float(Den * Vmax *D)/float(Vcin)
+	print ReD
 	if ReD <= 100:
 		NuD = 0.9 * pow(ReD,0.4)*pow(Pr,0.36)*pow((Pr/Prs),0.25)
 	else:
@@ -67,7 +90,7 @@ if system == 1:
 				if ReD <= 2e6:
 					NuD = 0.033 * pow(ReD,0.8)*pow(Pr,0.4)*pow((Pr/Prs),0.25)
 				else:
-					print "FIN"
+					print "El problema no puede ser resuelto de esta manera"
 
 else:
 	SD = sqrt( pow(SL,2) + pow((ST/2),2))
@@ -85,13 +108,13 @@ else:
 			if ReD <=2e6:
 				NuD = 0.031 * pow((ST/ SL),0.2)*pow(Red,0.8)*pow(pr,0.36)*pow((pr/prs),0.25)
 			else:
-				print "FIN"
+				print "El problema no puede ser resuelto de esta manera"
 
-HB = (NuD*Cterm)/D #Que es esta K??
+HB = (NuD*Cterm)/D
 N  = NFilas * NTubos
 As = N * pi * D * L
 M  = Den * Vmed * ST * L * NTubos
-TE = TS - (TS - TI ) * pow(e,(((-1)*As*HB)/(M*CP))) #De donde saco CP???
+TE = TS - (TS - TI ) * pow(e,(((-1)*As*HB)/(M*Cesp))) #De donde saco CP???
 A = (TS - TE) - (TS -TI)
 B = log((TS-TE)/(TS-TI))
 Tim = (A/B)
